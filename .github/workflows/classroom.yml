@@ -1,0 +1,70 @@
+name: Autograding Tests
+'on':
+- workflow_dispatch
+- repository_dispatch
+permissions:
+  checks: write
+  actions: read
+  contents: read
+jobs:
+  run-autograding-tests:
+    runs-on: ubuntu-latest
+    if: github.actor != 'github-classroom[bot]'
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    - name: Node
+      id: node
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: Node
+        setup-command: ''
+        command: make test try=Node
+        timeout: 1
+        max-score: 20
+    - name: createTree
+      id: createtree
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: createTree
+        setup-command: ''
+        command: make test try=createTree
+        timeout: 1
+        max-score: 20
+    - name: searchTree
+      id: searchtree
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: searchTree
+        setup-command: ''
+        command: make test try=searchTree
+        timeout: 1
+        max-score: 30
+    - name: treeSize
+      id: treesize
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: treeSize
+        setup-command: ''
+        command: make test try=treeSize
+        timeout: 1
+        max-score: 30
+    - name: treeHeight
+      id: treeheight
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: treeHeight
+        setup-command: ''
+        command: make test try=treeHeight
+        timeout: 1
+        max-score: 1
+    - name: Autograding Reporter
+      uses: classroom-resources/autograding-grading-reporter@v1
+      env:
+        NODE_RESULTS: "${{steps.node.outputs.result}}"
+        CREATETREE_RESULTS: "${{steps.createtree.outputs.result}}"
+        SEARCHTREE_RESULTS: "${{steps.searchtree.outputs.result}}"
+        TREESIZE_RESULTS: "${{steps.treesize.outputs.result}}"
+        TREEHEIGHT_RESULTS: "${{steps.treeheight.outputs.result}}"
+      with:
+        runners: node,createtree,searchtree,treesize,treeheight
